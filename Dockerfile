@@ -2,7 +2,7 @@
 FROM node:20.15.1-alpine AS base
 
 # Update and upgrade base packages to patch vulnerabilities
-RUN apk update && apk upgrade -y && apk add --no-cache openssl
+RUN apk update && apk upgrade && apk add --no-cache openssl
 
 # 2. Set Working Directory: Create a directory inside the container to house our app.
 WORKDIR /app
