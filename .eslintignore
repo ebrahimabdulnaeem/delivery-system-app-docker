@@ -1,0 +1,10 @@
+# Prisma generated files
+src/generated/**/*
+**/prisma/client/**/*
+**/node_modules/**/*
+
+# Build files
+.next/**/*
+out/**/*
+build/**/*
+dist/**/* 

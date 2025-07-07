@@ -1,0 +1,168 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+
+// تعريف التحقق من البيانات لتحديث المدن
+const updateCitySchema = z.object({
+  name: z.string().min(2, {
+    message: "اسم المدينة يجب أن يكون أكثر من حرفين",
+  }),
+});
+
+export interface CityParams {
+  params: {
+    id: string;
+  };
+}
+
+// الحصول على تفاصيل مدينة محددة
+export async function GET(
+  request: NextRequest,
+  { params }: CityParams
+) {
+  try {
+    const cityId = params.id;
+
+    // البحث عن المدينة في قاعدة البيانات
+    const city = await prisma.cities.findUnique({
+      where: { id: cityId },
+    });
+
+    // التحقق من وجود المدينة
+    if (!city) {
+      return NextResponse.json(
+        { message: "المدينة غير موجودة" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(city, { status: 200 });
+  } catch (error) {
+    console.error("خطأ في الحصول على تفاصيل المدينة:", error);
+    return NextResponse.json(
+      { message: "حدث خطأ أثناء الحصول على تفاصيل المدينة" },
+      { status: 500 }
+    );
+  }
+}
+
+// تحديث مدينة محددة
+export async function PUT(
+  request: NextRequest,
+  { params }: CityParams
+) {
+  try {
+    const cityId = params.id;
+    const body = await request.json();
+
+    // التحقق أولاً من وجود المدينة
+    const existingCity = await prisma.cities.findUnique({
+      where: { id: cityId }
+    });
+
+    if (!existingCity) {
+      return NextResponse.json(
+        { message: "المدينة غير موجودة" },
+        { status: 404 }
+      );
+    }
+
+    // التحقق من صحة البيانات
+    const validationResult = updateCitySchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json({ 
+        message: "البيانات المدخلة غير صالحة",
+        errors: validationResult.error.errors 
+      }, { status: 400 });
+    }
+
+    const updateData = validationResult.data;
+
+    // التحقق من عدم وجود مدينة أخرى بنفس الاسم
+    const nameExists = await prisma.cities.findFirst({
+      where: { 
+        name: { equals: updateData.name, mode: 'insensitive' }, 
+        id: { not: cityId }
+      }
+    });
+
+    if (nameExists) {
+      return NextResponse.json(
+        { message: "يوجد مدينة أخرى بنفس الاسم" },
+        { status: 409 }
+      );
+    }
+
+    // تحديث المدينة
+    const updatedCity = await prisma.cities.update({
+      where: { id: cityId },
+      data: {
+        ...updateData,
+        updated_at: new Date()
+      }
+    });
+
+    return NextResponse.json({
+      message: "تم تحديث المدينة بنجاح",
+      city: updatedCity
+    }, { status: 200 });
+  } catch (error) {
+    console.error("خطأ في تحديث المدينة:", error);
+    return NextResponse.json(
+      { message: "حدث خطأ أثناء تحديث المدينة" },
+      { status: 500 }
+    );
+  }
+}
+
+// حذف مدينة محددة
+export async function DELETE(
+  request: NextRequest,
+  { params }: CityParams
+) {
+  try {
+    const cityId = params.id;
+
+    // التحقق من وجود المدينة
+    const existingCity = await prisma.cities.findUnique({
+      where: { id: cityId }
+    });
+
+    if (!existingCity) {
+      return NextResponse.json(
+        { message: "المدينة غير موجودة" },
+        { status: 404 }
+      );
+    }
+
+    // التحقق من عدم وجود طلبات مرتبطة بهذه المدينة
+    const ordersWithCity = await prisma.orders.count({
+      where: { recipient_city: existingCity.name }
+    });
+
+    if (ordersWithCity > 0) {
+      return NextResponse.json(
+        { 
+          message: "لا يمكن حذف المدينة لأنها مرتبطة بطلبات",
+          ordersCount: ordersWithCity
+        },
+        { status: 400 }
+      );
+    }
+
+    // حذف المدينة
+    await prisma.cities.delete({
+      where: { id: cityId }
+    });
+
+    return NextResponse.json({
+      message: "تم حذف المدينة بنجاح"
+    }, { status: 200 });
+  } catch (error) {
+    console.error("خطأ في حذف المدينة:", error);
+    return NextResponse.json(
+      { message: "حدث خطأ أثناء حذف المدينة" },
+      { status: 500 }
+    );
+  }
+} 
