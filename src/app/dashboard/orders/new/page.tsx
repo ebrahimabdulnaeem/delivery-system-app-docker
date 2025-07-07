@@ -89,7 +89,7 @@ const orderSchema = z.object({
   barcode: z.string().min(4, { message: "الباركود يجب أن يكون أكثر من 3 أحرف" }),
   recipient_name: z.string().min(2, { message: "اسم المستلم يجب أن يكون أكثر من حرفين" }),
   recipient_phone1: z.string().regex(/^[0-9]{11}$/, { message: "رقم الهاتف يجب أن يتكون من 11 رقمًا بالضبط" }),
-  recipient_phone2: z.string().optional(),
+  recipient_phone2: z.string().regex(/^[0-9]{11}$/, { message: "رقم الهاتف يجب أن يتكون من 11 رقمًا بالضبط" }).optional().or(z.literal('')),
   recipient_address: z.string().min(5, { message: "العنوان يجب أن يكون أكثر من 4 أحرف" }),
   recipient_city: z.string().min(2, { message: "المدينة يجب أن تكون أكثر من حرفين" }),
   cod_amount: z.number().positive({ message: "المبلغ يجب أن يكون أكبر من صفر" }),
@@ -534,6 +534,8 @@ export default function CreateOrderPage() {
                   <Input
                     id="recipient_phone2"
                     name="recipient_phone2"
+                    type="tel"
+                    maxLength={11}
                     value={formData.recipient_phone2}
                     onChange={handleChange}
                     placeholder="هاتف إضافي (اختياري)"
