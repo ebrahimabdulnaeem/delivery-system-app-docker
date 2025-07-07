@@ -88,7 +88,7 @@ const datePickerCustomStyles = `
 const orderSchema = z.object({
   barcode: z.string().min(4, { message: "الباركود يجب أن يكون أكثر من 3 أحرف" }),
   recipient_name: z.string().min(2, { message: "اسم المستلم يجب أن يكون أكثر من حرفين" }),
-  recipient_phone1: z.string().min(8, { message: "رقم الهاتف يجب أن يكون على الأقل 8 أرقام" }),
+  recipient_phone1: z.string().regex(/^[0-9]{11}$/, { message: "رقم الهاتف يجب أن يتكون من 11 رقمًا بالضبط" }),
   recipient_phone2: z.string().optional(),
   recipient_address: z.string().min(5, { message: "العنوان يجب أن يكون أكثر من 4 أحرف" }),
   recipient_city: z.string().min(2, { message: "المدينة يجب أن تكون أكثر من حرفين" }),
@@ -516,6 +516,8 @@ export default function CreateOrderPage() {
                   <Input
                     id="recipient_phone1"
                     name="recipient_phone1"
+                    type="tel"
+                    maxLength={11}
                     value={formData.recipient_phone1}
                     onChange={handleChange}
                     placeholder="الهاتف الرئيسي"
