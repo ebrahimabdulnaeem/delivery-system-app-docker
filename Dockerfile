@@ -1,8 +1,8 @@
 # 1. Base Image: Use an official Node.js image. Alpine is lightweight.
-FROM node:20-bullseye
+FROM node:20.15.1-alpine AS base
 
 # Update and upgrade base packages to patch vulnerabilities
-RUN apt-get update && apt-get upgrade -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk upgrade -y && apk add --no-cache openssl
 
 # 2. Set Working Directory: Create a directory inside the container to house our app.
 WORKDIR /app

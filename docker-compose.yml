@@ -1,17 +1,13 @@
 services:
   # Next.js Application Service
   next-app:
-    platform: linux/arm64
     build: .
     container_name: next_delivery_app
     ports:
       - "3000:3000"
-    # Restart policy
     restart: unless-stopped
-    # Depend on the database service to ensure it starts first
     depends_on:
       - postgres
-    # Environment variables are pulled from the .env file
     env_file:
       - .env
 
@@ -19,18 +15,14 @@ services:
   postgres:
     image: postgres:15-alpine
     container_name: postgres_db
-    ports:
-      - "5432:5432"
-    # Restart policy
-    restart: unless-stopped
-    # Environment variables for the database
+    restart: always
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    # Persist data even if the container is removed
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+# Define the named volume for data persistence
 volumes:
   postgres_data:
