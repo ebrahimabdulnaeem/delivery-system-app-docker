@@ -18,22 +18,36 @@ import {
   Truck,
   Users,
   Navigation,
-  Home,
-  LogOut
+  Home
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+
+// تعريف واجهة لإحصائيات الطلبات
+interface OrderStats {
+  totalOrders: number;
+  delivered: number;
+  pending: number;
+  returned: number;
+  totalAmount: number;
+  deliveredAmount: number;
+}
 
 // تكوين بيانات الصفحة
 export const dynamic = 'force-dynamic';
 
 // استخدام كائن عالمي للتخزين المؤقت خارج المكون
-const CACHE = {
+const CACHE: {
+  orderStats: OrderStats | null;
+  recentOrders: Order[] | null;
+  drivers: Driver[] | null;
+  lastFetch: number;
+  staleTime: number;
+} = {
   orderStats: null,
   recentOrders: null,
   drivers: null,
   lastFetch: 0,
-  // مدة صلاحية البيانات المؤقتة (5 دقائق)
   staleTime: 5 * 60 * 1000
 };
 
@@ -54,7 +68,7 @@ const calculatePercentage = (value, total) => {
 };
 
 export default function DashboardPage() {
-  const { user, logout, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   const router = useRouter();
   const [orderStats, setOrderStats] = useState({
     totalOrders: 0,
@@ -73,11 +87,7 @@ export default function DashboardPage() {
     return CACHE.lastFetch > 0 && (Date.now() - CACHE.lastFetch) < CACHE.staleTime;
   }, []);
 
-  // آلية تسجيل الخروج
-  const handleLogout = async () => {
-    await logout();
-    router.push("/login");
-  };
+
 
   // التحقق من وجود المستخدم
   useEffect(() => {
@@ -248,16 +258,7 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold">لوحة التحكم</h1>
             <p className="text-muted-foreground mt-2">مرحباً بك في نظام إدارة التوصيل</p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-lg font-semibold">{user.username}</p>
-              <p className="text-sm text-gray-500">{user.role}</p>
-            </div>
-            <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
-              <LogOut size={16} />
-              تسجيل الخروج
-            </Button>
-          </div>
+  
         </div>
         
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

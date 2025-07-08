@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
+
 import { LogOut, Search } from "lucide-react";
 
 export function Header() {
@@ -28,11 +28,19 @@ export function Header() {
           />
         </div>
       </div>
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
-          <LogOut className="h-4 w-4" />
-          <span>تسجيل الخروج</span>
-        </Button>
+      <div className="flex items-center gap-4 p-2 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 shadow-inner">
+        <div className="text-right">
+          <p className="font-bold text-md bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500 dark:from-blue-400 dark:to-purple-400">
+            {user.username}
+          </p>
+          <p className="text-xs text-gray-600 dark:text-gray-300 font-mono tracking-wider">{user.role}</p>
+        </div>
+        <button 
+          onClick={handleLogout} 
+          title="تسجيل الخروج"
+          className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 dark:focus:ring-offset-gray-800 focus:ring-purple-500 transition-all duration-200 transform hover:scale-110">
+          <LogOut className="h-5 w-5" />
+        </button>
       </div>
     </header>
   );
