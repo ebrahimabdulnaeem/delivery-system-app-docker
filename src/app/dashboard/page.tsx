@@ -246,9 +246,7 @@ export default function DashboardPage() {
   }
 
   // حساب النسب المئوية
-  const deliveredPercentage = calculatePercentage(orderStats.delivered, orderStats.totalOrders);
-  const pendingPercentage = calculatePercentage(orderStats.pending, orderStats.totalOrders);
-  const returnedPercentage = calculatePercentage(orderStats.returned, orderStats.totalOrders);
+
 
   return (
     <MainLayout>
@@ -262,55 +260,50 @@ export default function DashboardPage() {
         </div>
         
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="overflow-hidden dashboard-card">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium">إجمالي الطلبات</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{orderStats.totalOrders}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                جميع طلبات التوصيل الموجودة في النظام
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="overflow-hidden dashboard-card">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium">تم التوصيل</CardTitle>
-              <PackageCheck className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">{orderStats.delivered}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {deliveredPercentage}% من إجمالي الطلبات
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="overflow-hidden dashboard-card">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium">قيد الانتظار</CardTitle>
-              <PackageClock className="h-4 w-4 text-amber-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-amber-500">{orderStats.pending}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {pendingPercentage}% من إجمالي الطلبات
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="overflow-hidden dashboard-card">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium">مرتجع</CardTitle>
-              <PackageX className="h-4 w-4 text-red-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">{orderStats.returned}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {returnedPercentage}% من إجمالي الطلبات
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+            <Card className="overflow-hidden dashboard-card bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">إجمالي الطلبات</CardTitle>
+                <Package className="h-4 w-4 text-blue-100" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{orderStats.totalOrders}</div>
+                <p className="text-xs text-blue-200 mt-1">جميع طلبات التوصيل الموجودة في النظام</p>
+              </CardContent>
+            </Card>
+
+            <Card className="overflow-hidden dashboard-card bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">تم التوصيل</CardTitle>
+                <PackageCheck className="h-4 w-4 text-green-100" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{orderStats.delivered}</div>
+                <p className="text-xs text-green-200 mt-1">{calculatePercentage(orderStats.delivered, orderStats.totalOrders)}% من إجمالي الطلبات</p>
+              </CardContent>
+            </Card>
+
+            <Card className="overflow-hidden dashboard-card bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">قيد الانتظار</CardTitle>
+                <PackageClock className="h-4 w-4 text-amber-100" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{orderStats.pending}</div>
+                <p className="text-xs text-amber-200 mt-1">{calculatePercentage(orderStats.pending, orderStats.totalOrders)}% من إجمالي الطلبات</p>
+              </CardContent>
+            </Card>
+
+            <Card className="overflow-hidden dashboard-card bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">مرتجع</CardTitle>
+                <PackageX className="h-4 w-4 text-red-100" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{orderStats.returned}</div>
+                <p className="text-xs text-red-200 mt-1">{calculatePercentage(orderStats.returned, orderStats.totalOrders)}% من إجمالي الطلبات</p>
+              </CardContent>
+            </Card>
+          </div>
 
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
