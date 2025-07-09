@@ -748,18 +748,18 @@ export default function CreateOrderPage() {
                 )}
               </div>
 
-              <div className="flex items-center justify-between mt-6">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-between items-center mt-6 gap-4">
             <Button
               type="button"
               variant="outline"
               onClick={() => router.push("/dashboard/orders")}
-                  className="px-6"
+                  className="w-full sm:w-auto px-6"
             >
               إلغاء
             </Button>
                 <Button 
                   type="submit" 
-                  className="bg-[#13183F] text-white px-8 py-2.5"
+                  className="bg-[#13183F] text-white w-full sm:w-auto px-8 py-2.5"
                   disabled={isLoading}
                 >
                   {isLoading ? <Loader2 className="h-5 w-5 animate-spin ml-2" /> : null}

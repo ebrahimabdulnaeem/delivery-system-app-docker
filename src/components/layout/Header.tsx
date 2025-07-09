@@ -4,8 +4,13 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 import { LogOut, Search } from "lucide-react";
+import { ReactNode } from 'react';
 
-export function Header() {
+interface HeaderProps {
+  children?: ReactNode;
+}
+
+export function Header({ children }: HeaderProps) {
   const router = useRouter();
   const { user, logout } = useAuth();
 
@@ -17,8 +22,10 @@ export function Header() {
   if (!user) return null;
 
   return (
-    <header className="fixed left-0 right-64 top-0 z-30 border-b bg-background h-20 flex items-center px-8">
-      <div className="flex-1">
+    <header className="fixed left-0 right-0 md:right-64 top-0 z-30 border-b bg-background h-20 flex items-center justify-between md:justify-normal px-4 sm:px-8">
+      <div className="flex items-center gap-4">
+        {children}
+        <div className="hidden md:block flex-1">
         <div className="relative w-full max-w-md">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <input
@@ -26,6 +33,7 @@ export function Header() {
             placeholder="بحث..."
             className="w-full rounded-md border border-input bg-background py-2.5 px-4 pr-10 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
+          </div>
         </div>
       </div>
       <div className="flex items-center gap-4 p-2 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 shadow-inner">

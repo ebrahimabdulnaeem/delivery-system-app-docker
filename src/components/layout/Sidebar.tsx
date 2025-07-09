@@ -18,8 +18,14 @@ import {
   Database,
   PackageCheck,
   ScanBarcode,
-  Search
+  Search,
+  X
 } from "lucide-react";
+
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
 type NavItem = {
   title: string;
@@ -103,11 +109,19 @@ const navItems: NavItem[] = [
   },
 ];
 
-export function Sidebar() {
+export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { user, isLoading } = useAuth();
 
   // عرض هيكل عظمي أثناء التحميل أو إذا لم يكن هناك مستخدم
+  const sidebarClasses = cn(
+    "h-screen w-64 flex flex-col fixed top-0 right-0 z-50 border-l bg-sidebar transition-transform duration-300 ease-in-out",
+    // On mobile, slide in and out based on the isOpen state
+    isOpen ? "translate-x-0" : "translate-x-full",
+    // On desktop, always be visible and in place
+    "md:translate-x-0"
+  );
+
   if (isLoading || !user) {
     return (
       <div className="hidden md:flex h-screen w-64 flex-col fixed top-0 right-0 z-40 border-l bg-sidebar animate-pulse">
@@ -127,13 +141,26 @@ export function Sidebar() {
   }
 
   return (
-    <div className="hidden md:flex h-screen w-64 flex-col fixed top-0 right-0 z-40 border-l bg-sidebar">
-      <div className="flex h-20 items-center border-b px-6">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <LayoutGrid className="h-6 w-6" />
-          <span className="font-semibold">نظام إدارة التوصيل</span>
-        </Link>
-      </div>
+    <>
+      {/* Backdrop for mobile */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 z-40 md:hidden"
+          onClick={onClose}
+        ></div>
+      )}
+
+      <div className={sidebarClasses}>
+        <div className="flex h-20 items-center justify-between border-b px-6">
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <LayoutGrid className="h-6 w-6" />
+            <span className="font-semibold">نظام الإدارة</span>
+          </Link>
+          <button onClick={onClose} className="md:hidden p-2 rounded-md hover:bg-sidebar-accent/50" aria-label="إغلاق الشريط الجانبي">
+            <X size={20} />
+          </button>
+        </div>
+
       <div className="flex-1 overflow-auto py-6 px-4">
         <nav className="flex flex-col gap-1">
           {navItems.map((item) => {
@@ -146,6 +173,7 @@ export function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={onClose}
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
                   pathname === item.href
@@ -173,5 +201,6 @@ export function Sidebar() {
         </div>
       </div>
     </div>
+    </>
   );
 } 
