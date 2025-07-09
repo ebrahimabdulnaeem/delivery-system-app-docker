@@ -2,17 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -51,33 +52,48 @@ export default function LoginPage() {
         toast.error("فشل تسجيل الدخول. يرجى التحقق من البريد الإلكتروني وكلمة المرور.");
       }
     } catch (error) {
-      toast.error("حدث خطأ أثناء تسجيل الدخول.");
+      let errorMessage = "حدث خطأ غير متوقع.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      toast.error(`فشل تسجيل الدخول: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-gray-50">
-      <div className="mx-auto w-full max-w-md">
-        <Card className="w-full">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold">تسجيل الدخول</CardTitle>
-            <CardDescription>
-              أدخل بيانات الدخول للوصول إلى لوحة التحكم
+    <div className="flex min-h-screen items-center justify-center p-4 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-background-pan [background-size:200%] text-white">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center animate-fade-in-up [animation-delay:200ms] [animation-fill-mode:forwards]">
+          <h1 className="text-4xl font-extrabold tracking-tight text-white drop-shadow-lg">مرحباً بك مجدداً</h1>
+          <p className="mt-2 text-lg text-gray-200">
+            سجل الدخول للمتابعة إلى لوحة التحكم
+          </p>
+        </div>
+
+        <Card className="shadow-2xl bg-white/10 backdrop-blur-sm border-white/20 animate-fade-in-up [animation-delay:400ms] [animation-fill-mode:forwards]">
+          <CardHeader>
+            <CardTitle className="text-2xl text-white">تسجيل الدخول</CardTitle>
+            <CardDescription className="text-gray-300">
+              أدخل بياناتك للوصول إلى حسابك
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>البريد الإلكتروني</FormLabel>
+                      <FormLabel className="text-white">البريد الإلكتروني</FormLabel>
                       <FormControl>
-                        <Input placeholder="example@example.com" {...field} />
+                        <Input 
+                          placeholder="name@example.com" 
+                          {...field} 
+                          className="h-12 text-base bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:bg-white/30 focus:ring-white/50 transition-all duration-300"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -88,9 +104,14 @@ export default function LoginPage() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>كلمة المرور</FormLabel>
+                      <FormLabel className="text-white">كلمة المرور</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="******" {...field} />
+                        <Input 
+                          type="password" 
+                          placeholder="••••••••" 
+                          {...field} 
+                          className="h-12 text-base bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:bg-white/30 focus:ring-white/50 transition-all duration-300"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -100,47 +121,35 @@ export default function LoginPage() {
                   control={form.control}
                   name="remember"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 space-x-reverse">
-                      <FormControl>
+                    <FormItem className="flex items-center space-x-2 space-y-0">
+                       <FormControl>
                         <Checkbox
+                          id="remember"
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
                       </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>تذكرني</FormLabel>
-                      </div>
+                      <FormLabel htmlFor="remember" className="cursor-pointer text-white">
+                        تذكرني
+                      </FormLabel>
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "جاري التحميل..." : "تسجيل الدخول"}
+                <Button type="submit" className="w-full h-12 text-base font-bold bg-white text-purple-600 hover:bg-gray-200 hover:scale-105 transition-all duration-300 shadow-lg" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      جاري التحقق...
+                    </> 
+                  ) : (
+                    'تسجيل الدخول'
+                  )}
                 </Button>
               </form>
             </Form>
-            <div className="mt-4 text-center text-sm">
-              ليس لديك حساب؟{" "}
-              <Link href="/register" className="text-blue-600 hover:text-blue-800">
-                إنشاء حساب جديد
-              </Link>
-            </div>
           </CardContent>
-          <CardFooter className="flex flex-col">
-            <div className="text-center text-sm text-muted-foreground">
-              <p>بيانات تسجيل الدخول للتجربة:</p>
-              <p className="mt-1">
-                <code className="rounded bg-gray-100 px-1 py-0.5">admin@example.com / admin123</code>
-              </p>
-              <p className="mt-1">
-                <code className="rounded bg-gray-100 px-1 py-0.5">dataentry@example.com / data123</code>
-              </p>
-              <p className="mt-1">
-                <code className="rounded bg-gray-100 px-1 py-0.5">accounts@example.com / finance123</code>
-              </p>
-            </div>
-          </CardFooter>
         </Card>
       </div>
     </div>
   );
-} 
+}
