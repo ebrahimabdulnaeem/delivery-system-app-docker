@@ -15,10 +15,7 @@ import {
   PackageX,
   Clock,
   ArrowUpRight,
-  Truck,
-  Users,
-  Navigation,
-  Home
+  Truck
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -407,84 +404,7 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Link href="/dashboard/orders">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Package className="h-8 w-8 text-blue-500" />
-                <div>
-                  <CardTitle>إدارة الطلبات</CardTitle>
-                  <CardDescription>عرض، إضافة وتحديث الطلبات</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p>الوصول إلى جميع الطلبات في النظام، متابعة الحالة والتعديل عليها حسب الصلاحيات.</p>
-              </CardContent>
-            </Card>
-          </Link>
 
-          <Link href="/dashboard/drivers">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Truck className="h-8 w-8 text-green-500" />
-                <div>
-                  <CardTitle>إدارة السائقين</CardTitle>
-                  <CardDescription>عرض وإضافة بيانات السائقين</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p>إدارة السائقين المسجلين في النظام، إضافة سائقين جدد وتعيين المناطق لهم.</p>
-              </CardContent>
-            </Card>
-          </Link>
-
-          {user.role === "admin" && (
-            <Link href="/dashboard/users">
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardHeader className="flex flex-row items-center gap-4">
-                  <Users className="h-8 w-8 text-purple-500" />
-                  <div>
-                    <CardTitle>إدارة المستخدمين</CardTitle>
-                    <CardDescription>إدارة حسابات المستخدمين</CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p>إضافة وتعديل مستخدمي النظام، تعيين الصلاحيات وإدارة الأدوار.</p>
-                </CardContent>
-              </Card>
-            </Link>
-          )}
-
-          <Link href="/dashboard/cities">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Navigation className="h-8 w-8 text-yellow-500" />
-                <div>
-                  <CardTitle>إدارة المدن</CardTitle>
-                  <CardDescription>عرض وإضافة المدن</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p>إدارة المدن المتاحة في النظام للتوصيل واستخدامها في الطلبات.</p>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Home className="h-8 w-8 text-gray-500" />
-                <div>
-                  <CardTitle>الصفحة الرئيسية</CardTitle>
-                  <CardDescription>العودة للصفحة الرئيسية</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p>العودة إلى الصفحة الرئيسية للموقع والواجهة العامة.</p>
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
       </div>
     </MainLayout>
   );
