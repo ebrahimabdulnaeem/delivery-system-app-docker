@@ -542,30 +542,30 @@ function OrdersContent() {
                 orders.map((order, index) => {
                   const sequentialNumber = (pagination.currentPage - 1) * pagination.pageSize + (index + 1);
                   return (
-                    <div key={order.id} className="rounded-lg border p-4 bg-white shadow-sm">
-                      <div className="flex justify-between items-center mb-2">
+                    <div key={order.id} className="rounded-lg border p-3 bg-white shadow-sm space-y-2">
+                      <div className="flex justify-between items-center mb-1">
                         <span className="text-xs text-muted-foreground">#{sequentialNumber}</span>
-                        <span className={`inline-flex rounded-full px-2 py-1 text-xs ${getStatusBgColor(order.status)}`}>
-                          {getArabicOrderStatus(order.status)}
-                        </span>
+                        <span className={`inline-flex rounded-full px-2 py-1 text-xs ${getStatusBgColor(order.status)}`}>{getArabicOrderStatus(order.status)}</span>
                       </div>
-                      <div className="mb-1"><span className="font-semibold">الباركود: </span>{order.barcode}</div>
-                      <div className="mb-1"><span className="font-semibold">المستلم: </span>{order.recipient_name}</div>
-                      <div className="mb-1"><span className="font-semibold">رقم المستلم: </span>{order.recipient_phone1}</div>
-                      <div className="mb-1"><span className="font-semibold">المدينة: </span>{order.recipient_city}</div>
-                      <div className="mb-1"><span className="font-semibold">المبلغ: </span>{formatCurrency(order.cod_amount)}</div>
-                      <div className="mb-1"><span className="font-semibold">السائق: </span>{order.drivers?.driver_name || <span className="text-gray-400">غير معين</span>}</div>
-                      <div className="mb-1"><span className="font-semibold">تاريخ الطلب: </span>{(() => {
-                        const dateStr = order.order_date;
-                        const datePart = dateStr.split('T')[0];
-                        const [year, month, day] = datePart.split('-');
-                        const formatter = new Intl.DateTimeFormat('ar-EG', {
-                          year: 'numeric',
-                          month: 'numeric',
-                          day: 'numeric'
-                        });
-                        return formatter.format(new Date(Number(year), Number(month) - 1, Number(day)));
-                      })()}</div>
+                      <div className="space-y-1 text-sm break-words">
+                        <div><span className="font-semibold">الباركود: </span><span className="break-all">{order.barcode}</span></div>
+                        <div><span className="font-semibold">المستلم: </span><span className="break-words">{order.recipient_name}</span></div>
+                        <div><span className="font-semibold">رقم المستلم: </span><span className="break-all">{order.recipient_phone1}</span></div>
+                        <div><span className="font-semibold">المدينة: </span>{order.recipient_city}</div>
+                        <div><span className="font-semibold">المبلغ: </span>{formatCurrency(order.cod_amount)}</div>
+                        <div><span className="font-semibold">السائق: </span>{order.drivers?.driver_name || <span className="text-gray-400">غير معين</span>}</div>
+                        <div><span className="font-semibold">تاريخ الطلب: </span>{(() => {
+                          const dateStr = order.order_date;
+                          const datePart = dateStr.split('T')[0];
+                          const [year, month, day] = datePart.split('-');
+                          const formatter = new Intl.DateTimeFormat('ar-EG', {
+                            year: 'numeric',
+                            month: 'numeric',
+                            day: 'numeric'
+                          });
+                          return formatter.format(new Date(Number(year), Number(month) - 1, Number(day)));
+                        })()}</div>
+                      </div>
                       <div className="flex justify-end mt-2">
                         <Button size="sm" variant="outline" asChild>
                           <Link href={`/dashboard/orders/${order.id}`}>عرض</Link>
