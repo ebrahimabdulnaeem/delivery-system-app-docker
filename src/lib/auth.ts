@@ -1,7 +1,7 @@
-import { User, UserRole } from "@/types";
+import { User } from "@/types";
 import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
-import type { NextAuthOptions } from "next-auth";
+
 import CredentialsProvider from "next-auth/providers/credentials";
 import { JWT } from "next-auth/jwt";
 import { Session } from "next-auth";
@@ -19,6 +19,7 @@ export async function login(email: string, password: string): Promise<User | nul
     if (!passwordMatch) return null;
 
     // إخفاء كلمة المرور من الكائن المرجع
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _, ...userWithoutPassword } = user;
     
     return userWithoutPassword as User;
@@ -45,6 +46,7 @@ export async function getCurrentUserFromDb(id: string): Promise<User | null> {
     if (!user) return null;
 
     // إخفاء كلمة المرور من الكائن المرجع
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _, ...userWithoutPassword } = user;
     
     return userWithoutPassword as User;
@@ -104,6 +106,7 @@ export async function registerUser(userData: Omit<User, "id" | "createdAt" | "up
     });
 
     // إخفاء كلمة المرور من الكائن المرجع
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _, ...userWithoutPassword } = newUser;
     
     return userWithoutPassword as User;
@@ -137,12 +140,10 @@ export async function getAllUsers(): Promise<User[]> {
 
 // تعريف أنواع للمستخدم والجلسة
 interface CustomSession extends Session {
-  user?: {
-    id?: string;
-    name?: string;
-    email?: string;
-    role?: string;
-  }
+  user: {
+    id: string;
+    role: string;
+  } & Session['user'];
 }
 
 // إعدادات المصادقة NextAuth
@@ -171,6 +172,11 @@ export const authOptions = {
           const passwordMatch = await bcrypt.compare(credentials.password, user.password);
           if (!passwordMatch) {
             throw new Error("كلمة المرور غير صحيحة");
+          }
+
+          // التحقق من أن الحساب مفعل
+          if (user.role === "pending") {
+            throw new Error("حسابك قيد المراجعة. يرجى الانتظار حتى يتم تفعيله من قبل المسؤول.");
           }
 
           return {

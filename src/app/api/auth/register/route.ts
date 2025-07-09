@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
-import { UserRole } from "@/types";
+
 
 // تعريف التحقق من البيانات باستخدام zod
 const registerSchema = z.object({
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
         username,
         email,
         password: hashedPassword,
-        role: UserRole.DATA_ENTRY, // تعيين الدور الافتراضي
+        role: "pending", // تعيين الدور الافتراضي إلى قيد المراجعة
         createdAt: new Date(),
         updatedAt: new Date()
       }
