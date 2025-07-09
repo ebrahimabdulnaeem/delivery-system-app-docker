@@ -391,7 +391,8 @@ function OrdersContent() {
             </div>
           </CardHeader>
           <CardContent>
-            
+            {/* عرض الجدول على الشاشات المتوسطة والكبيرة */}
+            <div className="hidden sm:block">
             {isLoading ? (
               <div className="text-center p-10">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
@@ -453,74 +454,131 @@ function OrdersContent() {
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
                     {orders.map((order, index) => {
-                      // حساب الرقم التسلسلي بناءً على رقم الصفحة الحالية وحجم الصفحة
                       const sequentialNumber = (pagination.currentPage - 1) * pagination.pageSize + (index + 1);
-                      
                       return (
-                      <tr key={order.id} className="hover:bg-gray-50">
+                        <tr key={order.id} className="hover:bg-gray-50">
                           <td className="px-4 py-3 text-sm font-medium text-gray-500 text-center">
                             {sequentialNumber}
                           </td>
-                        <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">
-                          {order.barcode}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-900">
-                          <div>{order.recipient_name}</div>
-                          <div className="text-xs text-gray-500">{order.recipient_phone1}</div>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{order.recipient_city}</td>
-                        <td className="px-4 py-3 text-sm font-semibold text-gray-900">
-                          {formatCurrency(order.cod_amount)}
-                        </td>
-                        <td className="px-4 py-3 text-sm">
-                          <span className={`inline-flex rounded-full px-2 py-1 text-xs ${getStatusBgColor(order.status)}`}>
-                            {getArabicOrderStatus(order.status)}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-900">
-                          {order.drivers?.driver_name || (
-                            <span className="text-gray-400">غير معين</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-900">
-                          {(() => {
-                            // تحويل التاريخ إلى كائن Date
-                            const dateStr = order.order_date;
-                            // استخراج التاريخ فقط بدون الوقت (YYYY-MM-DD)
-                            const datePart = dateStr.split('T')[0];
-                            // تقسيم التاريخ إلى مكوناته
-                            const [year, month, day] = datePart.split('-');
-                            // إنشاء سلسلة نصية منسقة باللغة العربية
-                            const formatter = new Intl.DateTimeFormat('ar-EG', {
-                              year: 'numeric',
-                              month: 'numeric',
-                              day: 'numeric'
-                            });
-                            // إنشاء كائن تاريخ يحدد اليوم فقط بدون تأثير المنطقة الزمنية
-                            // نستخدم التاريخ بالصيغة: سنة، شهر (0-11)، يوم
-                            return formatter.format(new Date(Number(year), Number(month) - 1, Number(day)));
-                          })()}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-right">
-                          <div className="flex justify-end space-x-2 space-x-reverse">
-                            <Button size="sm" variant="outline" asChild>
-                              <Link href={`/dashboard/orders/${order.id}`}>
-                                عرض
-                              </Link>
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
+                          <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">
+                            {order.barcode}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-900">
+                            <div>{order.recipient_name}</div>
+                            <div className="text-xs text-gray-500">{order.recipient_phone1}</div>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-900">{order.recipient_city}</td>
+                          <td className="px-4 py-3 text-sm font-semibold text-gray-900">
+                            {formatCurrency(order.cod_amount)}
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            <span className={`inline-flex rounded-full px-2 py-1 text-xs ${getStatusBgColor(order.status)}`}>
+                              {getArabicOrderStatus(order.status)}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-900">
+                            {order.drivers?.driver_name || (
+                              <span className="text-gray-400">غير معين</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-900">
+                            {(() => {
+                              const dateStr = order.order_date;
+                              const datePart = dateStr.split('T')[0];
+                              const [year, month, day] = datePart.split('-');
+                              const formatter = new Intl.DateTimeFormat('ar-EG', {
+                                year: 'numeric',
+                                month: 'numeric',
+                                day: 'numeric'
+                              });
+                              return formatter.format(new Date(Number(year), Number(month) - 1, Number(day)));
+                            })()}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-right">
+                            <div className="flex justify-end space-x-2 space-x-reverse">
+                              <Button size="sm" variant="outline" asChild>
+                                <Link href={`/dashboard/orders/${order.id}`}>
+                                  عرض
+                                </Link>
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
                       );
                     })}
                   </tbody>
                 </table>
               </div>
             )}
-            
-            {/* Pagination */}
+            </div>
+            {/* عرض البطاقات على الجوال فقط */}
+            <div className="sm:hidden space-y-4">
+              {isLoading ? (
+                <div className="text-center p-10">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+                  <p>جاري التحميل...</p>
+                </div>
+              ) : error ? (
+                <div className="text-center p-10">
+                  <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+                    <p className="text-red-600">{error}</p>
+                    <Button 
+                      onClick={handleRefresh} 
+                      variant="outline"
+                      size="sm"
+                      className="mt-2"
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      إعادة المحاولة
+                    </Button>
+                  </div>
+                </div>
+              ) : orders.length === 0 ? (
+                <div className="text-center p-10">
+                  <Package className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-500">لا يوجد طلبات متطابقة مع البحث</p>
+                </div>
+              ) : (
+                orders.map((order, index) => {
+                  const sequentialNumber = (pagination.currentPage - 1) * pagination.pageSize + (index + 1);
+                  return (
+                    <div key={order.id} className="rounded-lg border p-4 bg-white shadow-sm">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-xs text-muted-foreground">#{sequentialNumber}</span>
+                        <span className={`inline-flex rounded-full px-2 py-1 text-xs ${getStatusBgColor(order.status)}`}>
+                          {getArabicOrderStatus(order.status)}
+                        </span>
+                      </div>
+                      <div className="mb-1"><span className="font-semibold">الباركود: </span>{order.barcode}</div>
+                      <div className="mb-1"><span className="font-semibold">المستلم: </span>{order.recipient_name}</div>
+                      <div className="mb-1"><span className="font-semibold">رقم المستلم: </span>{order.recipient_phone1}</div>
+                      <div className="mb-1"><span className="font-semibold">المدينة: </span>{order.recipient_city}</div>
+                      <div className="mb-1"><span className="font-semibold">المبلغ: </span>{formatCurrency(order.cod_amount)}</div>
+                      <div className="mb-1"><span className="font-semibold">السائق: </span>{order.drivers?.driver_name || <span className="text-gray-400">غير معين</span>}</div>
+                      <div className="mb-1"><span className="font-semibold">تاريخ الطلب: </span>{(() => {
+                        const dateStr = order.order_date;
+                        const datePart = dateStr.split('T')[0];
+                        const [year, month, day] = datePart.split('-');
+                        const formatter = new Intl.DateTimeFormat('ar-EG', {
+                          year: 'numeric',
+                          month: 'numeric',
+                          day: 'numeric'
+                        });
+                        return formatter.format(new Date(Number(year), Number(month) - 1, Number(day)));
+                      })()}</div>
+                      <div className="flex justify-end mt-2">
+                        <Button size="sm" variant="outline" asChild>
+                          <Link href={`/dashboard/orders/${order.id}`}>عرض</Link>
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+            {/* Pagination (نفسه للجوال والديسكتوب) */}
             {pagination.totalPages > 1 && (
-              <div className="flex justify-between items-center mt-6">
+              <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-2">
                 <div className="text-sm text-muted-foreground">
                   عرض {(pagination.currentPage - 1) * pagination.pageSize + 1} إلى {
                     Math.min(pagination.currentPage * pagination.pageSize, pagination.totalItems)
@@ -535,11 +593,10 @@ function OrdersContent() {
                   >
                     السابق
                   </Button>
-                  
                   {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
-                    .filter(page => 
-                      page === 1 || 
-                      page === pagination.totalPages || 
+                    .filter(page =>
+                      page === 1 ||
+                      page === pagination.totalPages ||
                       (page >= pagination.currentPage - 1 && page <= pagination.currentPage + 1)
                     )
                     .reduce((acc: (number | string)[], page, idx, array) => {
@@ -549,7 +606,7 @@ function OrdersContent() {
                       acc.push(page);
                       return acc;
                     }, [])
-                    .map((page, idx) => 
+                    .map((page, idx) =>
                       typeof page === 'number' ? (
                         <Button
                           key={idx}
@@ -567,7 +624,6 @@ function OrdersContent() {
                       )
                     )
                   }
-                  
                   <Button
                     variant="outline"
                     size="sm"

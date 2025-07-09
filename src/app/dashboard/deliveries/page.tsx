@@ -450,15 +450,16 @@ function DeliveriesContent() {
           <CardTitle>قائمة التسليمات</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <LoadingState />
-          ) : error ? (
-            <ErrorState error={error} />
-          ) : orders.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <>
-              <div className="overflow-x-auto mt-4">
+          {/* عرض الجدول على الشاشات المتوسطة والكبيرة */}
+          <div className="hidden sm:block mt-4">
+            {isLoading ? (
+              <LoadingState />
+            ) : error ? (
+              <ErrorState error={error} />
+            ) : orders.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="bg-gray-100 dark:bg-gray-800">
@@ -508,32 +509,66 @@ function DeliveriesContent() {
                   </tbody>
                 </table>
               </div>
-              
-              {/* التصفح */}
-              <div className="flex justify-between items-center mt-4">
-                <div className="text-sm text-gray-500">
-                  عرض {(pagination.currentPage - 1) * pagination.pageSize + 1} - {Math.min(pagination.currentPage * pagination.pageSize, pagination.totalItems)} من {pagination.totalItems}
+            )}
+          </div>
+          {/* عرض البطاقات على الجوال فقط */}
+          <div className="sm:hidden space-y-4 mt-4">
+            {isLoading ? (
+              <LoadingState />
+            ) : error ? (
+              <ErrorState error={error} />
+            ) : orders.length === 0 ? (
+              <EmptyState />
+            ) : (
+              orders.map((order) => (
+                <div key={order.id} className="rounded-lg border p-4 bg-white shadow-sm">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs text-muted-foreground">{order.barcode}</span>
+                    <DeliveryStatusBadge status={order.status} recentlyUpdated={order.recentlyUpdated} />
+                  </div>
+                  <div className="mb-1"><span className="font-semibold">تاريخ الطلب: </span>{new Date(order.order_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</div>
+                  <div className="mb-1"><span className="font-semibold">اسم المستلم: </span>{order.recipient_name}</div>
+                  <div className="mb-1"><span className="font-semibold">المدينة: </span>{order.recipient_city}</div>
+                  <div className="mb-1"><span className="font-semibold">المبلغ: </span>{formatCurrency(order.cod_amount)}</div>
+                  <div className="mb-1"><span className="font-semibold">المندوب: </span>{order.drivers?.driver_name || "غير مسند"}</div>
+                  <div className="flex justify-end mt-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => openStatusUpdateDialog(order)}
+                    >
+                      تحديث الحالة
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex space-x-2 space-x-reverse">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(pagination.currentPage - 1)}
-                    disabled={pagination.currentPage === 1 || isLoading}
-                  >
-                    السابق
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(pagination.currentPage + 1)}
-                    disabled={pagination.currentPage === pagination.totalPages || isLoading}
-                  >
-                    التالي
-                  </Button>
-                </div>
+              ))
+            )}
+          </div>
+          {/* التصفح (نفسه للجوال والديسكتوب) */}
+          {orders.length > 0 && (
+            <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-2">
+              <div className="text-sm text-gray-500">
+                عرض {(pagination.currentPage - 1) * pagination.pageSize + 1} - {Math.min(pagination.currentPage * pagination.pageSize, pagination.totalItems)} من {pagination.totalItems}
               </div>
-            </>
+              <div className="flex space-x-2 space-x-reverse">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(pagination.currentPage - 1)}
+                  disabled={pagination.currentPage === 1 || isLoading}
+                >
+                  السابق
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(pagination.currentPage + 1)}
+                  disabled={pagination.currentPage === pagination.totalPages || isLoading}
+                >
+                  التالي
+                </Button>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
