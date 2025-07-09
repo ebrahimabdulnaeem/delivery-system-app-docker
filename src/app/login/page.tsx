@@ -66,7 +66,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center p-4 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-background-pan [background-size:200%] text-white">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center animate-fade-in-up [animation-delay:200ms] [animation-fill-mode:forwards]">
-          <h1 className="text-4xl font-extrabold tracking-tight text-white drop-shadow-lg">مرحباً بك مجدداً</h1>
+          <h1 className="text-4xl font-extrabold tracking-tight text-white drop-shadow-lg">مرحبا بك في بيلا دونا</h1>
           <p className="mt-2 text-lg text-gray-200">
             سجل الدخول للمتابعة إلى لوحة التحكم
           </p>
