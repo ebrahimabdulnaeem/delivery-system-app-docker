@@ -267,6 +267,7 @@ export default function DataManagementPage() {
                       <SelectValue placeholder="اختر نوع البيانات" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="all">كل البيانات</SelectItem>
                       <SelectItem value="orders">الطلبات</SelectItem>
                       <SelectItem value="drivers">السائقين</SelectItem>
                       <SelectItem value="cities">المدن</SelectItem>
@@ -331,6 +332,7 @@ export default function DataManagementPage() {
                       <SelectValue placeholder="اختر نوع البيانات" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="all">كل البيانات</SelectItem>
                       <SelectItem value="orders">الطلبات</SelectItem>
                       <SelectItem value="drivers">السائقين</SelectItem>
                       <SelectItem value="cities">المدن</SelectItem>
