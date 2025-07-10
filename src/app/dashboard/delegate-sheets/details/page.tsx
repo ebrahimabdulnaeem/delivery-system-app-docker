@@ -99,6 +99,16 @@ function DelegateSheetDetailsPage() {
       setIsLoading(false);
     }
   }, [sheetId, fetchSheetDetails]);
+
+  // تشغيل الطباعة تلقائياً في وضع المعاينة
+  useEffect(() => {
+    if (isPreview && !isLoading && sheet) {
+      const timer = setTimeout(() => {
+        window.print();
+      }, 1000); // تأخير بسيط لضمان تحميل كل شيء في الصفحة
+      return () => clearTimeout(timer);
+    }
+  }, [isPreview, isLoading, sheet]);
   
   // تنسيق المبلغ
   const formatCurrency = (amount: number) => {
