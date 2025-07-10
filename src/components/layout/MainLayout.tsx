@@ -25,7 +25,7 @@ export function MainLayout({ children }: MainLayoutProps) {
             <Menu size={24} />
           </button>
         </Header>
-        <main className="pt-24 md:pt-28 px-4 sm:px-8 pb-10 max-w-7xl mx-auto">
+        <main className="pt-24 md:pt-28 px-4 sm:px-8 pb-10">
           {children}
         </main>
       </div>
