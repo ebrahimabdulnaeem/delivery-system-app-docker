@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import JSZip from 'jszip';
 
 // دالة لتحويل بيانات الجدول إلى تنسيق CSV
 function convertToCSV(data: Record<string, unknown>[]): string {
@@ -41,206 +42,100 @@ function convertToCSV(data: Record<string, unknown>[]): string {
 
 export async function GET(request: NextRequest) {
   try {
-    // الحصول على جلسة المستخدم الحالي
-    // نحتاج إلى تجاوز مشكلة نوع authOptions
-    // @ts-expect-error - تجاوز التحقق من النوع للحصول على الجلسة
+    // @ts-expect-error - Workaround for authOptions type issue
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { message: "غير مصرح لك بالوصول" },
-        { status: 401 }
-      );
+      return NextResponse.json({ message: "غير مصرح لك بالوصول" }, { status: 401 });
     }
-    
-    // التحقق من دور المستخدم (للمدراء فقط)
+
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      select: { role: true }
+      select: { role: true },
     });
-    
-    if (!user || user.role !== "admin") {
-      return NextResponse.json(
-        { message: "ليس لديك صلاحية للقيام بهذه العملية" },
-        { status: 403 }
-      );
+
+    if (user?.role !== 'admin') {
+      return NextResponse.json({ message: "ليس لديك صلاحية للقيام بهذه العملية" }, { status: 403 });
     }
-    
-    // الحصول على نوع البيانات المطلوب تصديرها
+
     const searchParams = request.nextUrl.searchParams;
-    const type = searchParams.get("type");
-    
+    const type = searchParams.get('type');
+
     if (!type) {
-      return NextResponse.json(
-        { message: "يجب تحديد نوع البيانات" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "يجب تحديد نوع البيانات" }, { status: 400 });
     }
-    
-    let data: Record<string, unknown>[] = [];
-    
-    // استخدام Prisma للوصول إلى البيانات
-    switch (type) {
-      case "orders":
-        const orders = await prisma.orders.findMany({
-          orderBy: { created_at: 'desc' },
-          select: {
-            id: true,
-            barcode: true,
-            recipient_name: true,
-            recipient_phone1: true,
-            recipient_phone2: true,
-            recipient_city: true,
-            recipient_address: true,
-            cod_amount: true,
-            status: true,
-            number_of_pieces: true,
-            order_description: true,
-            special_instructions: true,
-            sender_reference: true,
-            driver_id: true,
-            created_by: true,
-            order_date: true,
-            created_at: true,
-            updated_at: true
-          }
-        });
-        
-        data = orders.map(order => {
-          // معالجة التواريخ وتحويلها إلى نص
-          const formattedOrder: Record<string, unknown> = { ...order };
-          
-          if (order.order_date instanceof Date) {
-            formattedOrder.order_date = order.order_date.toISOString().split('T')[0];
-          }
-          
-          if (order.created_at instanceof Date) {
-            formattedOrder.created_at = order.created_at.toISOString();
-          }
-          
-          if (order.updated_at instanceof Date) {
-            formattedOrder.updated_at = order.updated_at.toISOString();
-          }
-          
-          return formattedOrder;
-        });
-        break;
-      case "drivers":
-        const drivers = await prisma.drivers.findMany({
-          orderBy: { created_at: 'desc' },
-          select: {
-            id: true,
-            driver_name: true,
-            driver_phone: true,
-            driver_id_number: true,
-            assigned_areas: true,
-            created_at: true,
-            updated_at: true
-          }
-        });
-        
-        data = drivers.map(driver => {
-          // معالجة التواريخ والبيانات المعقدة
-          const formattedDriver: Record<string, unknown> = { ...driver };
-          
-          if (driver.assigned_areas) {
-            formattedDriver.assigned_areas = JSON.stringify(driver.assigned_areas);
-          }
-          
-          if (driver.created_at instanceof Date) {
-            formattedDriver.created_at = driver.created_at.toISOString();
-          }
-          
-          if (driver.updated_at instanceof Date) {
-            formattedDriver.updated_at = driver.updated_at.toISOString();
-          }
-          
-          return formattedDriver;
-        });
-        break;
-      case "cities":
-        const cities = await prisma.cities.findMany({
-          orderBy: { name: 'asc' },
-          select: {
-            id: true,
-            name: true,
-            created_at: true,
-            updated_at: true
-          }
-        });
-        
-        data = cities.map(city => {
-          // معالجة التواريخ
-          const formattedCity: Record<string, unknown> = { ...city };
-          
-          if (city.created_at instanceof Date) {
-            formattedCity.created_at = city.created_at.toISOString();
-          }
-          
-          if (city.updated_at instanceof Date) {
-            formattedCity.updated_at = city.updated_at.toISOString();
-          }
-          
-          return formattedCity;
-        });
-        break;
-      case "users":
-        const users = await prisma.user.findMany({
-          // استخدام camelCase للحقول في prisma.user
-          orderBy: { createdAt: 'desc' },
-          select: {
-            id: true,
-            username: true,
-            email: true,
-            role: true,
-            createdAt: true,
-            updatedAt: true
-          }
-        });
-        
-        data = users.map(user => {
-          // تحويل camelCase إلى snake_case للتوافق مع باقي البيانات
-          const formattedUser: Record<string, unknown> = {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            role: user.role,
-            created_at: user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,
-            updated_at: user.updatedAt instanceof Date ? user.updatedAt.toISOString() : user.updatedAt
-          };
-          
-          return formattedUser;
-        });
-        break;
-      default:
-        return NextResponse.json(
-          { message: "نوع البيانات غير صالح" },
-          { status: 400 }
-        );
+
+    if (type === 'all') {
+      const zip = new JSZip();
+      const dataTypes = ['orders', 'drivers', 'cities', 'users'];
+
+      const promises = dataTypes.map(async (dataType) => {
+        let data: Record<string, unknown>[] = [];
+        switch (dataType) {
+          case 'orders':
+            const orders = await prisma.orders.findMany({ orderBy: { created_at: 'desc' } });
+            data = orders.map(o => ({ ...o, order_date: o.order_date?.toISOString().split('T')[0], created_at: o.created_at.toISOString(), updated_at: o.updated_at.toISOString() }));
+            break;
+          case 'drivers':
+            const drivers = await prisma.drivers.findMany({ orderBy: { created_at: 'desc' } });
+            data = drivers.map(d => ({ ...d, assigned_areas: JSON.stringify(d.assigned_areas), created_at: d.created_at.toISOString(), updated_at: d.updated_at.toISOString() }));
+            break;
+          case 'cities':
+            const cities = await prisma.cities.findMany({ orderBy: { name: 'asc' } });
+            data = cities.map(c => ({ ...c, created_at: c.created_at.toISOString(), updated_at: c.updated_at.toISOString() }));
+            break;
+          case 'users':
+            const users = await prisma.user.findMany({ orderBy: { createdAt: 'desc' } });
+            data = users.map(u => ({ ...u, createdAt: u.createdAt.toISOString(), updatedAt: u.updatedAt.toISOString() }));
+            break;
+        }
+        const csv = convertToCSV(data);
+        zip.file(`${dataType}.csv`, csv);
+      });
+
+      await Promise.all(promises);
+
+      const zipContent = await zip.generateAsync({ type: 'nodebuffer' });
+
+      return new Response(zipContent, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/zip',
+          'Content-Disposition': `attachment; filename="all_data_export_${new Date().toISOString().split('T')[0]}.zip"`,
+        },
+      });
+    } else {
+      let data: Record<string, unknown>[] = [];
+      switch (type) {
+        case 'orders':
+          const orders = await prisma.orders.findMany({ orderBy: { created_at: 'desc' } });
+          data = orders.map(o => ({ ...o, order_date: o.order_date?.toISOString().split('T')[0], created_at: o.created_at.toISOString(), updated_at: o.updated_at.toISOString() }));
+          break;
+        case 'drivers':
+          const drivers = await prisma.drivers.findMany({ orderBy: { created_at: 'desc' } });
+          data = drivers.map(d => ({ ...d, assigned_areas: JSON.stringify(d.assigned_areas), created_at: d.created_at.toISOString(), updated_at: d.updated_at.toISOString() }));
+          break;
+        case 'cities':
+          data = await prisma.cities.findMany({ orderBy: { name: 'asc' } });
+          break;
+        case 'users':
+          data = await prisma.user.findMany({ orderBy: { createdAt: 'desc' } });
+          break;
+        default:
+          return NextResponse.json({ message: 'نوع البيانات غير صالح' }, { status: 400 });
+      }
+
+      const csv = convertToCSV(data);
+      return new Response(csv, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/csv',
+          'Content-Disposition': `attachment; filename="${type}_export_${new Date().toISOString().split('T')[0]}.csv"`,
+        },
+      });
     }
-    
-    // تحويل البيانات إلى تنسيق CSV
-    const csvData = convertToCSV(data);
-    
-    // إرجاع البيانات
-    return NextResponse.json(
-      { 
-        success: true, 
-        csv: csvData, 
-        count: data.length 
-      },
-      { status: 200 }
-    );
-    
   } catch (error) {
-    console.error("خطأ في تصدير البيانات:", error);
-    
-    return NextResponse.json(
-      { 
-        message: "حدث خطأ أثناء تصدير البيانات", 
-        error: error instanceof Error ? error.message : String(error) 
-      },
-      { status: 500 }
-    );
+    console.error('خطأ في تصدير البيانات:', error);
+    return NextResponse.json({ message: 'حدث خطأ غير متوقع في الخادم' }, { status: 500 });
   }
-} 
+}

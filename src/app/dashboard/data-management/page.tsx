@@ -56,10 +56,14 @@ export default function DataManagementPage() {
   // معالجة اختيار ملف الاستيراد
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
-    
-    // التحقق من نوع الملف (يجب أن يكون CSV)
-    if (file && !file.name.toLowerCase().endsWith('.csv')) {
-      toast.error("يرجى اختيار ملف بتنسيق CSV فقط");
+    if (!file) return;
+
+    const isAll = importType === 'all';
+    const validExtension = isAll ? '.zip' : '.csv';
+    const errorMessage = isAll ? "يرجى اختيار ملف بتنسيق ZIP فقط" : "يرجى اختيار ملف بتنسيق CSV فقط";
+
+    if (!file.name.toLowerCase().endsWith(validExtension)) {
+      toast.error(errorMessage);
       event.target.value = '';
       return;
     }
@@ -78,42 +82,33 @@ export default function DataManagementPage() {
     try {
       setIsExporting(true);
       
-      // التحقق من نوع البيانات المراد تصديرها
       if (!exportType) {
         toast.error("يرجى اختيار نوع البيانات المراد تصديرها");
         setIsExporting(false);
         return;
       }
       
-      // إنشاء الطلب لتصدير البيانات
-      const response = await fetch(`/api/data-management/export?type=${exportType}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(`/api/data-management/export?type=${exportType}`);
       
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "حدث خطأ أثناء تصدير البيانات");
       }
-      
-      // الحصول على البيانات وتحويلها إلى ملف CSV للتنزيل
-      const data = await response.json();
-      
-      if (!data || !data.csv) {
-        throw new Error("لم يتم العثور على بيانات للتصدير");
-      }
-      
-      // إنشاء رابط تنزيل للملف CSV
-      const blob = new Blob([data.csv], { type: 'text/csv;charset=utf-8;' });
+
+      const isAll = exportType === 'all';
+      const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `${exportType}_export_${new Date().toISOString().split('T')[0]}.csv`);
+
+      const fileExtension = isAll ? 'zip' : 'csv';
+      const fileName = `${exportType}_export_${new Date().toISOString().split('T')[0]}.${fileExtension}`;
+      
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
       
       toast.success("تم تصدير البيانات بنجاح");
     } catch (error) {
@@ -348,7 +343,7 @@ export default function DataManagementPage() {
                       ref={fileInputRef}
                       id="csvFile"
                       type="file"
-                      accept=".csv"
+                      accept={importType === 'all' ? '.zip' : '.csv'}
                       onChange={handleFileChange}
                       className="hidden"
                     />
@@ -413,43 +408,49 @@ export default function DataManagementPage() {
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>تنسيق الملف</AlertTitle>
                   <AlertDescription>
-                    <p>يجب أن يكون الملف بتنسيق CSV ويحتوي على العناوين الصحيحة المطابقة لحقول جدول {importType === "orders" ? "الطلبات" : 
-                    importType === "drivers" ? "السائقين" : 
-                    importType === "cities" ? "المدن" : "المستخدمين"}.</p>
-                    <Separator className="my-2" />
-                    <p className="text-sm font-medium">الحقول المطلوبة:</p>
-                    <ul className="list-disc list-inside text-sm mt-1 space-y-1">
-                      {importType === "orders" && (
-                        <>
-                          <li>recipient_name - اسم المستلم</li>
-                          <li>recipient_phone1 - رقم هاتف المستلم</li>
-                          <li>recipient_city - مدينة المستلم</li>
-                          <li>recipient_address - عنوان المستلم</li>
-                          <li>cod_amount - مبلغ الدفع عند الاستلام</li>
-                          <li>status - حالة الطلب</li>
-                        </>
-                      )}
-                      {importType === "drivers" && (
-                        <>
-                          <li>driver_name - اسم السائق</li>
-                          <li>driver_phone - رقم هاتف السائق</li>
-                          <li>assigned_areas - المناطق المكلف بها</li>
-                        </>
-                      )}
-                      {importType === "cities" && (
-                        <>
-                          <li>name - اسم المدينة</li>
-                        </>
-                      )}
-                      {importType === "users" && (
-                        <>
-                          <li>username - اسم المستخدم</li>
-                          <li>email - البريد الإلكتروني</li>
-                          <li>role - الدور (admin, user)</li>
-                          <li>password - كلمة المرور</li>
-                        </>
-                      )}
-                    </ul>
+                    {importType === 'all' ? (
+                      <p>يجب أن يكون الملف بتنسيق ZIP ويحتوي على ملفات CSV التالية: orders.csv, drivers.csv, cities.csv, users.csv. يجب أن يحتوي كل ملف على الحقول المطلوبة الخاصة به.</p>
+                    ) : (
+                      <>
+                        <p>يجب أن يكون الملف بتنسيق CSV ويحتوي على العناوين الصحيحة المطابقة لحقول جدول {importType === "orders" ? "الطلبات" : 
+                        importType === "drivers" ? "السائقين" : 
+                        importType === "cities" ? "المدن" : "المستخدمين"}.</p>
+                        <Separator className="my-2" />
+                        <p className="text-sm font-medium">الحقول المطلوبة:</p>
+                        <ul className="list-disc list-inside text-sm mt-1 space-y-1">
+                          {importType === "orders" && (
+                            <>
+                              <li>recipient_name - اسم المستلم</li>
+                              <li>recipient_phone1 - رقم هاتف المستلم</li>
+                              <li>recipient_city - مدينة المستلم</li>
+                              <li>recipient_address - عنوان المستلم</li>
+                              <li>cod_amount - مبلغ الدفع عند الاستلام</li>
+                              <li>status - حالة الطلب</li>
+                            </>
+                          )}
+                          {importType === "drivers" && (
+                            <>
+                              <li>driver_name - اسم السائق</li>
+                              <li>driver_phone - رقم هاتف السائق</li>
+                              <li>assigned_areas - المناطق المكلف بها</li>
+                            </>
+                          )}
+                          {importType === "cities" && (
+                            <>
+                              <li>name - اسم المدينة</li>
+                            </>
+                          )}
+                          {importType === "users" && (
+                            <>
+                              <li>username - اسم المستخدم</li>
+                              <li>email - البريد الإلكتروني</li>
+                              <li>role - الدور (admin, user)</li>
+                              <li>password - كلمة المرور</li>
+                            </>
+                          )}
+                        </ul>
+                      </>
+                    )}
                   </AlertDescription>
                 </Alert>
               </CardContent>
