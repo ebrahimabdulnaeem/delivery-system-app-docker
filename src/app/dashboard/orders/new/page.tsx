@@ -495,23 +495,25 @@ export default function CreateOrderPage() {
                 </div>
                   {errors.order_date && <p className="text-sm text-red-500 mt-1">{errors.order_date}</p>}
                 </div>
+              </div>
 
-                {/* اسم المستلم */}
-                <div>
-                  <Label htmlFor="recipient_name" className="block mb-2 font-medium">
-                    اسم المستلم <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="recipient_name"
-                    name="recipient_name"
-                    value={formData.recipient_name}
-                    onChange={handleChange}
-                    placeholder="الاسم بالكامل"
-                    className={`p-3 ${errors.recipient_name ? "border-red-500" : "border-gray-200"}`}
-                  />
-                  {errors.recipient_name && <p className="text-sm text-red-500 mt-1">{errors.recipient_name}</p>}
-                </div>
+              {/* اسم المستلم */}
+              <div>
+                <Label htmlFor="recipient_name" className="block mb-2 font-medium">
+                  اسم المستلم <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="recipient_name"
+                  name="recipient_name"
+                  value={formData.recipient_name}
+                  onChange={handleChange}
+                  placeholder="الاسم بالكامل"
+                  className={`p-3 ${errors.recipient_name ? "border-red-500" : "border-gray-200"}`}
+                />
+                {errors.recipient_name && <p className="text-sm text-red-500 mt-1">{errors.recipient_name}</p>}
+              </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {/* رقم الهاتف 1 */}
                 <div>
                   <Label htmlFor="recipient_phone1" className="block mb-2 font-medium">
@@ -645,7 +647,7 @@ export default function CreateOrderPage() {
               </div>
 
               {/* قسم الخيارات الإضافية (القائمة المنسدلة) */}
-              <div className="border rounded-md p-4 mt-4">
+              <div className="border rounded-md p-4 mt-4 hidden">
                 <Button 
                   type="button" 
                   variant="ghost" 
