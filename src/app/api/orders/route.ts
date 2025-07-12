@@ -12,7 +12,7 @@ const orderSchema = z.object({
   recipient_phone2: z.string().optional(),
   recipient_address: z.string().min(5, { message: "العنوان يجب أن يكون أكثر من 4 أحرف" }),
   recipient_city: z.string().min(2, { message: "المدينة يجب أن تكون أكثر من حرفين" }),
-  cod_amount: z.number().positive({ message: "المبلغ يجب أن يكون أكبر من صفر" }),
+  cod_amount: z.number().min(0, { message: "المبلغ لا يمكن أن يكون سالبًا" }),
   order_description: z.string().optional(),
   special_instructions: z.string().optional(),
   sender_reference: z.string().optional(),

@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Loader2, ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
+import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { z } from "zod";
 import DatePicker from "react-datepicker";
 import { format } from "date-fns";
@@ -92,7 +92,10 @@ const orderSchema = z.object({
   recipient_phone2: z.string().regex(/^[0-9]{11}$/, { message: "رقم الهاتف يجب أن يتكون من 11 رقمًا بالضبط" }).optional().or(z.literal('')),
   recipient_address: z.string().min(5, { message: "العنوان يجب أن يكون أكثر من 4 أحرف" }),
   recipient_city: z.string().min(2, { message: "المدينة يجب أن تكون أكثر من حرفين" }),
-  cod_amount: z.number().positive({ message: "المبلغ يجب أن يكون أكبر من صفر" }),
+  cod_amount: z.preprocess(
+    (val) => (val === "" ? undefined : Number(val)),
+    z.number({ required_error: "حقل المبلغ مطلوب" }).min(0, { message: "المبلغ لا يمكن أن يكون سالبًا" })
+  ),
   order_description: z.string().min(3, { message: "وصف الطلب يجب أن يكون أكثر من حرفين" }),
   special_instructions: z.string().optional(),
   sender_reference: z.string().optional(),
@@ -169,6 +172,7 @@ export default function CreateOrderPage() {
   // معالجة تغيير الحقول
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: string | number | Date } }) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({ ...prev, [name]: value }));
     
     // مسح رسالة الخطأ عند تغيير القيمة
@@ -714,6 +718,7 @@ export default function CreateOrderPage() {
                       </div>
 
                       {/* باركود */}
+                      {/*
                       <div>
                         <Label htmlFor="barcode" className="block mb-2 font-medium">
                           رقم الباركود <span className="text-red-500">*</span>
@@ -743,6 +748,7 @@ export default function CreateOrderPage() {
                           <p className="text-xs text-muted-foreground">يتم توليد رقم باركود فريد لكل طلب تلقائياً</p>
                         </div>
                       </div>
+                      */}
                     </div>
                 </div>
                 )}
