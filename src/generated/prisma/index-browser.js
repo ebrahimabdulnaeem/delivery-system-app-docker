@@ -211,6 +211,19 @@ exports.Prisma.Delegate_sheet_ordersScalarFieldEnum = {
   created_at: 'created_at'
 };
 
+exports.Prisma.ProductScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  quantity: 'quantity',
+  price: 'price',
+  unit: 'unit',
+  variants: 'variants',
+  barcode: 'barcode',
+  expiry_date: 'expiry_date',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -236,7 +249,11 @@ exports.Prisma.JsonNullValueFilter = {
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
-
+exports.UnitOfMeasure = exports.$Enums.UnitOfMeasure = {
+  PIECE: 'PIECE',
+  KG: 'KG',
+  CARTON: 'CARTON'
+};
 
 exports.Prisma.ModelName = {
   User: 'User',
@@ -247,7 +264,8 @@ exports.Prisma.ModelName = {
   drivers: 'drivers',
   orders: 'orders',
   delegate_sheets: 'delegate_sheets',
-  delegate_sheet_orders: 'delegate_sheet_orders'
+  delegate_sheet_orders: 'delegate_sheet_orders',
+  Product: 'Product'
 };
 
 /**

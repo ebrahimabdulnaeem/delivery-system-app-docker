@@ -141,3 +141,24 @@ model delegate_sheet_orders {
   @@index([sheet_id], map: "idx_delegate_sheet_orders_sheet_id")
   @@index([order_id], map: "idx_delegate_sheet_orders_order_id")
 }
+
+model Product {
+  id          String        @id
+  name        String
+  quantity    Int
+  price       Decimal       @db.Decimal(10, 2)
+  unit        UnitOfMeasure
+  variants    Json?
+  barcode     String        @unique
+  expiry_date DateTime?     @map("expiry_date")
+  created_at  DateTime      @default(now()) @map("created_at")
+  updated_at  DateTime      @default(now()) @map("updated_at")
+
+  @@map("products")
+}
+
+enum UnitOfMeasure {
+  PIECE
+  KG
+  CARTON
+}

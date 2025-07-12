@@ -59,6 +59,11 @@ const navItems: NavItem[] = [
     icon: <PackageCheck size={18} />,
   },
   {
+    title: "المخزن",
+    href: "/dashboard/inventory",
+    icon: <LayoutGrid size={18} />,
+  },
+  {
     title: "إنشاء طلب",
     href: "/dashboard/orders/new",
     icon: <PackagePlus size={18} />,
