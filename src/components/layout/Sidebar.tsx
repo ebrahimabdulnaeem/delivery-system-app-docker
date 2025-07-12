@@ -83,6 +83,12 @@ const navItems: NavItem[] = [
         roles: [UserRole.ADMIN, UserRole.ACCOUNTS],
       },
       {
+        title: "بوالص الشحن",
+        href: "/dashboard/orders/waybills",
+        icon: <Package size={18} />,
+        roles: [UserRole.ADMIN, UserRole.DATA_ENTRY],
+      },
+      {
         title: "شيت المندوب",
         href: "/dashboard/orders/delegate-sheet",
         icon: <FileText size={18} />,
