@@ -52,6 +52,7 @@ const navItems: NavItem[] = [
     title: "الطلبات",
     href: "/dashboard/orders",
     icon: <Package size={18} />,
+    roles: [UserRole.ADMIN, UserRole.DATA_ENTRY, UserRole.ACCOUNTS, UserRole.ORDER_SEARCH],
   },
   {
     title: "التسليمات",
@@ -62,6 +63,7 @@ const navItems: NavItem[] = [
     title: "المخزن",
     href: "/dashboard/inventory",
     icon: <LayoutGrid size={18} />,
+    roles: [UserRole.ADMIN, UserRole.INVENTORY],
   },
   {
     title: "إنشاء طلب",
@@ -267,6 +269,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 {user.role === UserRole.ADMIN && "مدير"}
                 {user.role === UserRole.DATA_ENTRY && "مدخل بيانات"}
                 {user.role === UserRole.ACCOUNTS && "محاسب"}
+                {user.role === UserRole.INVENTORY && "مخزن"}
+                {user.role === UserRole.ORDER_SEARCH && "البحث عن أوردر"}
               </span>
             </div>
           </div>

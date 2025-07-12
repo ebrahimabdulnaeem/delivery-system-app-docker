@@ -19,9 +19,8 @@ import { z } from "zod";
 // تعريف التحقق من البيانات
 const formSchema = z.object({
   username: z.string().min(3, { message: "اسم المستخدم يجب أن يكون أكثر من حرفين" }),
-  email: z.string().email({ message: "يرجى إدخال بريد إلكتروني صحيح" }),
   password: z.string().min(6, { message: "كلمة المرور يجب أن تكون 6 أحرف على الأقل" }),
-  role: z.enum([UserRole.ADMIN, UserRole.DATA_ENTRY, UserRole.ACCOUNTS], {
+  role: z.enum([UserRole.ADMIN, UserRole.DATA_ENTRY, UserRole.ACCOUNTS, UserRole.INVENTORY, UserRole.ORDER_SEARCH], {
     message: "يرجى اختيار دور للمستخدم"
   }),
 });
@@ -35,7 +34,6 @@ export default function NewUserPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
-      email: "",
       password: "",
       role: UserRole.DATA_ENTRY,
     },
@@ -56,7 +54,10 @@ export default function NewUserPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          ...values,
+          email: `${values.username}@example.com` // Generate a dummy email
+        }),
       });
       
       if (response.ok) {
@@ -83,6 +84,10 @@ export default function NewUserPage() {
         return "مدخل بيانات";
       case UserRole.ACCOUNTS:
         return "محاسب";
+      case UserRole.INVENTORY:
+        return "مخزن";
+      case UserRole.ORDER_SEARCH:
+        return "البحث عن أوردر";
       default:
         return role;
     }
@@ -130,19 +135,7 @@ export default function NewUserPage() {
                   )}
                 />
                 
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>البريد الإلكتروني</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="example@example.com" type="email" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
                 
                 <FormField
                   control={form.control}

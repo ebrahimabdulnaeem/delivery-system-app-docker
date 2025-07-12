@@ -16,8 +16,8 @@ import { toast } from "sonner";
 import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
-  email: z.string().email({
-    message: "يرجى إدخال بريد إلكتروني صحيح",
+  identifier: z.string().min(1, {
+    message: "يرجى إدخال البريد الإلكتروني أو اسم المستخدم",
   }),
   password: z.string().min(6, {
     message: "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
@@ -33,7 +33,7 @@ export default function LoginPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      identifier: "",
       password: "",
       remember: false,
     },
@@ -43,7 +43,7 @@ export default function LoginPage() {
     setIsLoading(true);
     
     try {
-      const success = await login(values.email, values.password);
+      const success = await login(values.identifier, values.password);
       
       if (success) {
         toast.success("تم تسجيل الدخول بنجاح");
@@ -84,13 +84,13 @@ export default function LoginPage() {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
                   control={form.control}
-                  name="email"
+                  name="identifier"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-white">البريد الإلكتروني</FormLabel>
+                      <FormLabel className="text-white">البريد الإلكتروني أو اسم المستخدم</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="name@example.com" 
+                          placeholder="name@example.com أو username" 
                           {...field} 
                           className="h-12 text-base bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:bg-white/30 focus:ring-white/50 transition-all duration-300"
                         />

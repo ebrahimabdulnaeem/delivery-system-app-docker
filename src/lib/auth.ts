@@ -161,8 +161,13 @@ export const authOptions = {
             throw new Error("بيانات الاعتماد مفقودة");
           }
 
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email }
+          const user = await prisma.user.findFirst({
+            where: {
+              OR: [
+                { email: credentials.email },
+                { username: credentials.email },
+              ],
+            },
           });
 
           if (!user) {

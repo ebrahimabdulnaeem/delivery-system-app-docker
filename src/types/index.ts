@@ -2,7 +2,9 @@
 export enum UserRole {
   ADMIN = "admin",
   DATA_ENTRY = "data_entry",
-  ACCOUNTS = "accounts"
+  ACCOUNTS = "accounts",
+  INVENTORY = "inventory",
+  ORDER_SEARCH = "order_search"
 }
 
 // Order status types

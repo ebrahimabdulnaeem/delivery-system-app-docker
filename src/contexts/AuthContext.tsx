@@ -6,7 +6,7 @@ import { User } from "@/types";
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (identifier: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   isLoading: boolean;
 }
@@ -46,10 +46,10 @@ function AuthContextProvider({ children }: { children: ReactNode }) {
     updatedAt: new Date()
   } as User : null;
 
-  const login = async (email: string, password: string) => {
+  const login = async (identifier: string, password: string) => {
     try {
       const result = await signIn("credentials", {
-        email,
+        email: identifier, // The backend expects an 'email' field, which now contains either email or username
         password,
         redirect: false,
       });
