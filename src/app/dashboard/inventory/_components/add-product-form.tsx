@@ -92,7 +92,7 @@ export function AddProductForm({ isOpen, onClose }: AddProductFormProps) {
                 <FormItem>
                   <FormLabel>اسم المنتج</FormLabel>
                   <FormControl>
-                    <Input placeholder="مثال: لابتوب Dell" {...field} />
+                    <Input placeholder="ادخل اسم المنتج" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -188,9 +188,9 @@ export function AddProductForm({ isOpen, onClose }: AddProductFormProps) {
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
-                        mode="single"
+                        
                         selected={field.value || undefined}
-                        onSelect={field.onChange}
+                        onSelect={(date) => field.onChange(date)}
                       />
                     </PopoverContent>
                   </Popover>
